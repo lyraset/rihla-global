@@ -4,8 +4,22 @@ import { authConfig } from './lib/auth.config.js'
 // Edge-safe instance (no Node providers) — only reads/decodes the session JWT.
 const { auth } = NextAuth(authConfig)
 
+/**
+ * Resolve the true public origin of the request. Behind a proxy (Vercel), the
+ * real host/scheme arrive in x-forwarded-* headers, so we prefer those over
+ * req.nextUrl.origin (which can fall back to localhost). This keeps admin
+ * redirects on the deployed domain regardless of any AUTH_URL/env misconfig.
+ */
+function publicOrigin(req) {
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host')
+  if (!host) return req.nextUrl.origin
+  const proto = req.headers.get('x-forwarded-proto') || (host.startsWith('localhost') ? 'http' : 'https')
+  return `${proto}://${host}`
+}
+
 export default auth((req) => {
-  const { pathname, origin } = req.nextUrl
+  const { pathname } = req.nextUrl
+  const origin = publicOrigin(req)
   // Public admin routes (no session required): login + first-run setup.
   const isPublicAdmin = pathname === '/admin/login' || pathname === '/admin/setup'
   const loggedIn = Boolean(req.auth)
