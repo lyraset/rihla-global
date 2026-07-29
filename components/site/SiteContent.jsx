@@ -783,7 +783,7 @@ function Footer({ brand, contact, socials, pages }) {
           <h4 className="mb-4 font-heading font-semibold text-white">Quick Links</h4>
           <ul className="space-y-2.5 text-sm">
             {NAV_LINKS.map((l) => <li key={l.href}><Link href={l.href} className="text-white/70 transition hover:text-green-400">{l.label}</Link></li>)}
-            {pages.map((p) => <li key={p.slug}><Link href={`/${p.slug}`} className="text-white/70 transition hover:text-green-400">{p.title}</Link></li>)}
+            {pages.filter((p) => p.slug !== 'about').map((p) => <li key={p.slug}><Link href={`/${p.slug}`} className="text-white/70 transition hover:text-green-400">{p.title}</Link></li>)}
           </ul>
         </div>
         <div>
