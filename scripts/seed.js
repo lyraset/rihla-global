@@ -5,7 +5,6 @@
  *   npm run seed        (loads .env.local via node --env-file)
  */
 import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
 import { connectDB } from '../lib/db.js'
 import { env } from '../lib/env.js'
 import { Stat } from '../models/Stat.js'
@@ -17,7 +16,6 @@ import { Faq } from '../models/Faq.js'
 import { Country } from '../models/Country.js'
 import { Page } from '../models/Page.js'
 import { SiteSettings } from '../models/SiteSettings.js'
-import { AdminUser } from '../models/AdminUser.js'
 
 const STATS = [
   { label: 'Years of Excellence', value: 10, suffix: '+' },
@@ -57,19 +55,19 @@ const TESTIMONIALS = [
 ]
 
 const COUNTRIES = [
-  { name: 'Turkey', code: 'TR', flag: '🇹🇷', visaTypes: ['Tourist', 'Work', 'Student'] },
-  { name: 'UK', code: 'GB', flag: '🇬🇧', visaTypes: ['Student', 'Work', 'Tourist'] },
-  { name: 'UAE', code: 'AE', flag: '🇦🇪', visaTypes: ['Work', 'Business', 'Tourist'] },
-  { name: 'Saudi Arabia', code: 'SA', flag: '🇸🇦', visaTypes: ['Work', 'Business', 'Tourist'] },
-  { name: 'USA', code: 'US', flag: '🇺🇸', visaTypes: ['Student', 'Business', 'Tourist'] },
-  { name: 'Italy', code: 'IT', flag: '🇮🇹', visaTypes: ['Student', 'Work', 'Tourist'] },
-  { name: 'Philippines', code: 'PH', flag: '🇵🇭', visaTypes: ['Work', 'Tourist'] },
-  { name: 'Thailand', code: 'TH', flag: '🇹🇭', visaTypes: ['Tourist', 'Business'] },
-  { name: 'Indonesia', code: 'ID', flag: '🇮🇩', visaTypes: ['Tourist', 'Business'] },
-  { name: 'Malaysia', code: 'MY', flag: '🇲🇾', visaTypes: ['Student', 'Work', 'Tourist'] },
-  { name: 'Sri Lanka', code: 'LK', flag: '🇱🇰', visaTypes: ['Tourist', 'Business'] },
-  { name: 'Azerbaijan', code: 'AZ', flag: '🇦🇿', visaTypes: ['Tourist', 'Work'] },
-  { name: 'Brunei', code: 'BN', flag: '🇧🇳', visaTypes: ['Work', 'Tourist'] },
+  { name: 'Turkey', code: 'TR', flag: '🇹🇷', visaTypes: ['Tourist', 'Work', 'Student'], blurb: 'Student, work and tourist visas for Turkey — including university placements and fast e-visa support.' },
+  { name: 'UK', code: 'GB', flag: '🇬🇧', visaTypes: ['Student', 'Work', 'Tourist'], blurb: 'Complete UK visa support — student (CAS & university offers), skilled worker, and visitor visas.' },
+  { name: 'UAE', code: 'AE', flag: '🇦🇪', visaTypes: ['Work', 'Business', 'Tourist'], blurb: 'Employment, business and tourist visas for the UAE, with document attestation and quick processing.' },
+  { name: 'Saudi Arabia', code: 'SA', flag: '🇸🇦', visaTypes: ['Work', 'Business', 'Tourist'], blurb: 'Work, business and visit visas for Saudi Arabia, including Umrah and family-visit support.' },
+  { name: 'USA', code: 'US', flag: '🇺🇸', visaTypes: ['Student', 'Business', 'Tourist'], blurb: 'Guidance for US F-1 student, B1/B2 visitor and business visas, with full interview preparation.' },
+  { name: 'Italy', code: 'IT', flag: '🇮🇹', visaTypes: ['Student', 'Work', 'Tourist'], blurb: 'Study, work and Schengen tourist visas for Italy, including university admissions and appointments.' },
+  { name: 'Philippines', code: 'PH', flag: '🇵🇭', visaTypes: ['Work', 'Tourist'], blurb: 'Work and tourist visa processing for the Philippines with complete documentation support.' },
+  { name: 'Thailand', code: 'TH', flag: '🇹🇭', visaTypes: ['Tourist', 'Business'], blurb: 'Tourist and business visa assistance for Thailand, including visa-on-arrival guidance.' },
+  { name: 'Indonesia', code: 'ID', flag: '🇮🇩', visaTypes: ['Tourist', 'Business'], blurb: 'Tourist and business visa support for Indonesia with itinerary and document help.' },
+  { name: 'Malaysia', code: 'MY', flag: '🇲🇾', visaTypes: ['Student', 'Work', 'Tourist'], blurb: 'Student, work and tourist visas for Malaysia, including university placements.' },
+  { name: 'Sri Lanka', code: 'LK', flag: '🇱🇰', visaTypes: ['Tourist', 'Business'], blurb: 'Tourist and business (ETA) visa processing for Sri Lanka with quick turnaround.' },
+  { name: 'Azerbaijan', code: 'AZ', flag: '🇦🇿', visaTypes: ['Tourist', 'Work'], blurb: 'Tourist and work visa support for Azerbaijan, including fast e-visa processing.' },
+  { name: 'Brunei', code: 'BN', flag: '🇧🇳', visaTypes: ['Work', 'Tourist'], blurb: 'Work and visit visa assistance for Brunei with full documentation support.' },
 ]
 
 const FAQS = [
@@ -159,23 +157,6 @@ async function seedSettings() {
   console.log('  ✓ SiteSettings: singleton upserted')
 }
 
-async function seedAdmin() {
-  if (!env.ADMIN_SEED_EMAIL || !env.ADMIN_SEED_PASSWORD) {
-    console.log('  · AdminUser: skipped (set ADMIN_SEED_EMAIL / ADMIN_SEED_PASSWORD to create one)')
-    return
-  }
-  const passwordHash = await bcrypt.hash(env.ADMIN_SEED_PASSWORD, 12)
-  await AdminUser.updateOne(
-    { email: env.ADMIN_SEED_EMAIL.toLowerCase() },
-    {
-      $set: { name: 'Administrator', role: 'superadmin', isActive: true, mustChangePassword: true },
-      $setOnInsert: { passwordHash },
-    },
-    { upsert: true },
-  )
-  console.log(`  ✓ AdminUser: ${env.ADMIN_SEED_EMAIL} (superadmin)`)
-}
-
 async function main() {
   console.log('Seeding Rihla content into MongoDB…')
   await connectDB()
@@ -188,9 +169,8 @@ async function main() {
   await upsertMany(Country, COUNTRIES, 'name')
   await upsertMany(Faq, FAQS, 'question')
   await upsertMany(Page, PAGES, 'slug')
-  await seedAdmin()
   await mongoose.connection.close()
-  console.log('Done.')
+  console.log('Done. Create your admin at /admin (first-run setup) or: npm run create-admin -- <email> <password>')
   process.exit(0)
 }
 

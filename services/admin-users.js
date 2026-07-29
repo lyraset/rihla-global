@@ -19,10 +19,16 @@ export async function listAdminUsers() {
   return AdminUser.find().sort({ createdAt: -1 })
 }
 
-export async function createAdminUser({ name, email, password, role = 'editor' }) {
+/** How many admin accounts exist — drives the first-run setup flow. */
+export async function countAdmins() {
+  await connectDB()
+  return AdminUser.countDocuments()
+}
+
+export async function createAdminUser({ name, email, password, role = 'editor', mustChangePassword = false }) {
   await connectDB()
   const passwordHash = await bcrypt.hash(password, 12)
-  return AdminUser.create({ name, email, passwordHash, role, mustChangePassword: true })
+  return AdminUser.create({ name, email, passwordHash, role, mustChangePassword })
 }
 
 export async function setAdminActive(id, isActive) {

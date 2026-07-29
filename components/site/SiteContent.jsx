@@ -659,7 +659,7 @@ function CountryDetail({ country, services, steps }) {
             <CountryFlag code={country.code} flag={country.flag} name={country.name} />
             <h1 className="font-heading text-4xl font-bold md:text-5xl">{country.name}</h1>
           </div>
-          <p className="mt-3 max-w-xl text-white/70">Visa categories we process for {country.name} — with full eligibility assessment, documentation and filing support.</p>
+          <p className="mt-3 max-w-2xl text-white/70">{country.blurb || `Visa categories we process for ${country.name} — with full eligibility assessment, documentation and filing support.`}</p>
         </div>
       </section>
 
