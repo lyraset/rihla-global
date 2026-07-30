@@ -465,7 +465,7 @@ function CountryFlag({ code, flag, name, className = 'h-7 w-10' }) {
 
 function VisaPill({ label }) {
   return (
-    <span className="rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-semibold text-green-700 ring-1 ring-green-600/15 dark:bg-green-500/10 dark:text-green-300 dark:ring-green-400/20">
+    <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-700 ring-1 ring-green-600/15 dark:bg-green-500/10 dark:text-green-300 dark:ring-green-400/20">
       {label}
     </span>
   )
@@ -473,47 +473,21 @@ function VisaPill({ label }) {
 
 function CountryCard({ c }) {
   const href = c.code ? `/countries/${c.code.toLowerCase()}` : null
-  const code = (c.code || '').toLowerCase()
-  const count = c.visaTypes?.length || 0
-  const cls = 'group flex flex-col overflow-hidden rounded-2xl border border-navy-800/10 bg-white shadow-sm transition duration-300 hover:-translate-y-1.5 hover:border-green-600/40 hover:shadow-xl dark:border-white/10 dark:bg-navy-800'
+  const types = c.visaTypes || []
+  const cls = 'group flex items-center gap-3.5 rounded-xl border border-navy-800/10 bg-white p-3.5 text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-green-600/40 hover:shadow-md dark:border-white/10 dark:bg-navy-800'
   const inner = (
     <>
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-navy-800">
-        {code ? (
-          <img
-            src={`https://flagcdn.com/w640/${code}.png`}
-            alt={`${c.name} flag`}
-            loading="lazy"
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-          />
-        ) : (
-          <div className="grid h-full w-full place-items-center text-5xl">{c.flag || '🌐'}</div>
-        )}
-        <div className="absolute inset-0 bg-linear-to-t from-navy-900/85 via-navy-900/20 to-transparent" />
-        <div className="absolute inset-x-4 bottom-3 flex items-end justify-between gap-2">
-          <h3 className="font-heading text-xl font-bold text-white drop-shadow-sm">{c.name}</h3>
-          {count > 0 && (
-            <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm">
-              {count} visa{count > 1 ? 's' : ''}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        {count > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {c.visaTypes.map((t) => <VisaPill key={t} label={t} />)}
+      <CountryFlag code={c.code} flag={c.flag} name={c.name} className="h-10 w-14" />
+      <div className="min-w-0 flex-1">
+        <div className="truncate font-heading text-[15px] font-semibold text-navy-900 dark:text-white">{c.name}</div>
+        {types.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {types.slice(0, 3).map((t) => <VisaPill key={t} label={t} />)}
+            {types.length > 3 && <VisaPill label={`+${types.length - 3}`} />}
           </div>
         )}
-        {c.blurb ? (
-          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-navy-800/70 dark:text-gray-300">{c.blurb}</p>
-        ) : null}
-        {href && (
-          <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-green-600 transition group-hover:gap-2.5">
-            View visa options <ArrowRight size={15} />
-          </span>
-        )}
       </div>
+      {href && <ArrowRight size={16} className="shrink-0 text-navy-800/30 transition group-hover:translate-x-0.5 group-hover:text-green-600 dark:text-white/30" />}
     </>
   )
   return href
@@ -525,7 +499,7 @@ function Countries({ countries }) {
   if (!countries.length) return null
   return (
     <Section id="countries" center eyebrow="Where We Send" title="Countries We Cover" subtitle="Trusted for visas to top destinations worldwide — tap any country to explore every visa category we process.">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
         {countries.map((c) => <CountryCard key={c.id || c.name} c={c} />)}
       </div>
     </Section>
@@ -696,7 +670,7 @@ function CountryDetail({ country, services, steps }) {
             <Link href="/countries" className="hover:text-green-300">Countries</Link> <span className="text-white/40">/</span> {country.name}
           </p>
           <div className="mt-4 flex items-center gap-4">
-            <CountryFlag code={country.code} flag={country.flag} name={country.name} className="h-12 w-[72px] md:h-14 md:w-20" />
+            <CountryFlag code={country.code} flag={country.flag} name={country.name} className="h-9 w-12 md:h-10 md:w-14" />
             <h1 className="font-heading text-4xl font-bold md:text-5xl">{country.name}</h1>
           </div>
           <p className="mt-3 max-w-2xl text-white/70">{country.blurb || `Visa categories we process for ${country.name} — with full eligibility assessment, documentation and filing support.`}</p>
