@@ -1,8 +1,11 @@
 import SiteContent from '../../components/site/SiteContent.jsx'
 import { getSiteData } from '../../lib/site-data.js'
+import { buildMetadata } from '../../lib/seo.js'
 
 export const dynamic = 'force-dynamic'
-export const metadata = { title: 'Success Stories — Rihla Global' }
+export async function generateMetadata() {
+  return buildMetadata({ path: '/success', fallbackTitle: 'Success Stories — Rihla Global' })
+}
 
 export default async function SuccessPage() {
   const data = await getSiteData()

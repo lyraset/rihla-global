@@ -3,13 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Inbox, FileText, Settings, ScrollText, Users,
+  LayoutDashboard, Inbox, FileText, Search, Settings, ScrollText, Users,
 } from 'lucide-react'
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/leads', label: 'Leads', icon: Inbox },
   { href: '/admin/content', label: 'Content', icon: FileText },
+  { href: '/admin/seo', label: 'SEO', icon: Search },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
   { href: '/admin/audit', label: 'Audit log', icon: ScrollText },
 ]

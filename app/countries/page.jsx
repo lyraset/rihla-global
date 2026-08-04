@@ -1,8 +1,11 @@
 import SiteContent from '../../components/site/SiteContent.jsx'
 import { getSiteData } from '../../lib/site-data.js'
+import { buildMetadata } from '../../lib/seo.js'
 
 export const dynamic = 'force-dynamic'
-export const metadata = { title: 'Countries We Cover — Rihla Global' }
+export async function generateMetadata() {
+  return buildMetadata({ path: '/countries', fallbackTitle: 'Countries We Cover — Rihla Global' })
+}
 
 export default async function CountriesPage() {
   const data = await getSiteData()
