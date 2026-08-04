@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import SiteContent from '../../../components/site/SiteContent.jsx'
 import { getSiteData } from '../../../lib/site-data.js'
 import { buildMetadata } from '../../../lib/seo.js'
+import PageSchema from '../../../components/site/PageSchema.jsx'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,5 +24,10 @@ export default async function CountryPage({ params }) {
   const data = await getSiteData()
   const exists = data.countries.some((c) => (c.code || '').toLowerCase() === code.toLowerCase())
   if (!exists) notFound()
-  return <SiteContent data={data} page="country" slug={code} />
+  return (
+    <>
+      <PageSchema data={data} page="country" slug={code} />
+      <SiteContent data={data} page="country" slug={code} />
+    </>
+  )
 }

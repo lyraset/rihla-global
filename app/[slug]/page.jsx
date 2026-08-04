@@ -3,6 +3,7 @@ import SiteContent from '../../components/site/SiteContent.jsx'
 import { getSiteData } from '../../lib/site-data.js'
 import { getPageBySlug } from '../../services/content.js'
 import { buildMetadata } from '../../lib/seo.js'
+import PageSchema from '../../components/site/PageSchema.jsx'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,5 +27,10 @@ export default async function InfoPage({ params }) {
   const { slug } = await params
   const data = await getSiteData()
   if (!data.pages.some((p) => p.slug === slug)) notFound()
-  return <SiteContent data={data} page="page" slug={slug} />
+  return (
+    <>
+      <PageSchema data={data} page="page" slug={slug} />
+      <SiteContent data={data} page="page" slug={slug} />
+    </>
+  )
 }
