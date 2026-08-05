@@ -13,6 +13,8 @@ function resolve(settings, f) {
   const v = getPath(settings, f.name)
   if (f.type === 'stringlist') return Array.isArray(v) ? v.join('\n') : ''
   if (f.type === 'boolean') return Boolean(v)
+  // Images are stored as a media subdocument; the form edits just its URL.
+  if (f.type === 'image') return v?.url ?? ''
   return v ?? ''
 }
 
@@ -32,7 +34,17 @@ function SettingField({ f, value }) {
       {wide ? (
         <textarea id={f.name} name={f.name} rows={3} defaultValue={value} className={inputClass} />
       ) : (
-        <input id={f.name} name={f.name} type="text" defaultValue={value} className={inputClass} />
+        <input
+          id={f.name}
+          name={f.name}
+          type={f.type === 'image' ? 'url' : 'text'}
+          placeholder={f.placeholder}
+          defaultValue={value}
+          className={inputClass}
+        />
+      )}
+      {f.type === 'image' && value && (
+        <img src={value} alt="" className="mt-2 h-24 w-full rounded-lg object-cover ring-1 ring-navy-800/10" />
       )}
       {f.help && <p className="mt-1 text-xs text-navy-800/50">{f.help}</p>}
     </div>

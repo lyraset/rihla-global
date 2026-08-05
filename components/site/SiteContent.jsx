@@ -344,10 +344,10 @@ function Hero({ hero, formCfg }) {
             {hero.subheadline || 'Expert guidance for student, work, tourist, business and PR visas — backed by a 98% success rate and complete transparency at every step.'}
           </p>
           <div className="animate-fade-up mt-8 flex flex-wrap items-center gap-3" style={{ animationDelay: '0.3s' }}>
-            <Link href="/contact" className="inline-flex items-center gap-2 rounded-full bg-green-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-green-900/30 transition hover:bg-green-700">
+            <Link href={hero.primaryCtaHref || '/contact'} className="inline-flex items-center gap-2 rounded-full bg-green-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-green-900/30 transition hover:bg-green-700">
               {hero.primaryCtaLabel || 'Book Free Consultation'} <ArrowRight size={16} />
             </Link>
-            <Link href="/services" className="rounded-full border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10">
+            <Link href={hero.secondaryCtaHref || '/services'} className="rounded-full border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10">
               {hero.secondaryCtaLabel || 'Explore Services'}
             </Link>
           </div>
