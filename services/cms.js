@@ -19,6 +19,28 @@ export async function createEntity(Model, doc) {
   return Model.create(doc)
 }
 
+/**
+ * Idempotently insert a collection's shipped default rows.
+ *
+ * Used by collections whose rows map onto fixed render sites (page sections,
+ * spotlight cards) so the admin opens with the live copy already editable.
+ * Upserts keyed on `uniqueBy` and uses $setOnInsert, so an editor's changes are
+ * never overwritten and a second call is a no-op.
+ */
+export async function ensureDefaultRows(Model, { uniqueBy, rows = [] }) {
+  if (!rows.length) return 0
+  await connectDB()
+  const ops = rows.map((row) => ({
+    updateOne: {
+      filter: { [uniqueBy]: row[uniqueBy] },
+      update: { $setOnInsert: row },
+      upsert: true,
+    },
+  }))
+  const res = await Model.bulkWrite(ops, { ordered: false })
+  return res?.upsertedCount || 0
+}
+
 export async function updateEntity(Model, id, doc) {
   await connectDB()
   if (!mongoose.isValidObjectId(id)) return null

@@ -1,4 +1,5 @@
 import { siteOrigin } from '../../lib/sitemap-data.js'
+import { sectionCopy } from '../../lib/cms/section-defaults.js'
 import {
   organizationSchema, websiteSchema, webPageSchema, breadcrumbSchema,
   faqSchema, serviceListSchema, countryServiceSchema, buildGraph,
@@ -24,12 +25,18 @@ export default function PageSchema({ data = {}, page, slug }) {
 
   const crumbs = (trail) => breadcrumbSchema([{ name: 'Home', path: '/' }, ...trail], origin)
 
+  // A section hidden in Admin → Content → Page sections is not on the page, so
+  // its markup must go too: describing content a visitor cannot see is a
+  // structured-data policy violation.
+  const visible = (key) => sectionCopy(data.sections, key).isVisible
+  const ifVisible = (key, node) => (visible(key) ? node : undefined)
+
   switch (page) {
     case 'home':
       nodes.push(
         webPageSchema({ origin, path: '/', title: settings.brandName || 'Rihla Global' }),
-        serviceListSchema(data.services, origin),
-        faqSchema(data.faqs),
+        ifVisible('services', serviceListSchema(data.services, origin)),
+        ifVisible('faqs', faqSchema(data.faqs)),
       )
       break
 
@@ -44,7 +51,7 @@ export default function PageSchema({ data = {}, page, slug }) {
       nodes.push(
         webPageSchema({ origin, path: '/services', title: 'Our Services' }),
         crumbs([{ name: 'Services', path: '/services' }]),
-        serviceListSchema(data.services, origin),
+        ifVisible('services', serviceListSchema(data.services, origin)),
       )
       break
 
@@ -59,7 +66,7 @@ export default function PageSchema({ data = {}, page, slug }) {
       nodes.push(
         webPageSchema({ origin, path: '/success', title: 'Success Stories' }),
         crumbs([{ name: 'Success', path: '/success' }]),
-        faqSchema(data.faqs),
+        ifVisible('faqs', faqSchema(data.faqs)),
       )
       break
 

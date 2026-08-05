@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { sectionCopy, SPOTLIGHT_DEFAULTS } from '../../lib/cms/section-defaults.js'
 import {
   GraduationCap, Briefcase, Plane, Building2, FileCheck2,
   ShieldCheck, Globe2, Award, Compass, Sparkles,
@@ -64,8 +65,6 @@ const DEFAULT_TESTIMONIALS = [
 ]
 const HERO_IMG = 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=70'
 const TEAM_IMG = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=70'
-const STUDY_IMG = 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=70'
-const WORK_IMG = 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=70'
 
 function useTheme() {
   const [dark, setDark] = useState(false)
@@ -409,9 +408,9 @@ function Section({ id, eyebrow, title, subtitle, center = false, bg = '', classN
   )
 }
 
-function VisaServices({ services }) {
+function VisaServices({ services, copy }) {
   return (
-    <Section id="services" center eyebrow="What We Offer" title="Visa Services" subtitle="Specialized support across every visa category.">
+    <Section id="services" center eyebrow={copy.eyebrow} title={copy.title} subtitle={copy.subtitle}>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
         {services.map((s) => (
           <div key={s.id || s.title} className="group rounded-2xl border border-navy-800/10 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-600/30 hover:shadow-xl dark:border-white/10 dark:bg-navy-800">
@@ -426,9 +425,9 @@ function VisaServices({ services }) {
   )
 }
 
-function WhyChooseUs({ features }) {
+function WhyChooseUs({ features, copy }) {
   return (
-    <Section id="about" bg="bg-gray-50 dark:bg-navy-900/40" eyebrow="Why Rihla" title="Why Choose Us" subtitle="A decade of trusted, transparent visa expertise behind every application.">
+    <Section id="about" bg="bg-gray-50 dark:bg-navy-900/40" eyebrow={copy.eyebrow} title={copy.title} subtitle={copy.subtitle}>
       <div className="grid items-center gap-10 md:grid-cols-2">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {features.map((f) => (
@@ -495,10 +494,10 @@ function CountryCard({ c }) {
     : <div className={cls}>{inner}</div>
 }
 
-function Countries({ countries }) {
+function Countries({ countries, copy }) {
   if (!countries.length) return null
   return (
-    <Section id="countries" center eyebrow="Where We Send" title="Countries We Cover" subtitle="Trusted for visas to top destinations worldwide — tap any country to explore every visa category we process.">
+    <Section id="countries" center eyebrow={copy.eyebrow} title={copy.title} subtitle={copy.subtitle}>
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
         {countries.map((c) => <CountryCard key={c.id || c.name} c={c} />)}
       </div>
@@ -506,21 +505,18 @@ function Countries({ countries }) {
   )
 }
 
-function Spotlight() {
-  const cards = [
-    { label: 'Study Abroad', copy: 'Campus placements, scholarships and student-visa filing for top global universities.', img: STUDY_IMG },
-    { label: 'Work Abroad', copy: 'Employer-sponsored placements and work-permit processing across skilled industries.', img: WORK_IMG },
-  ]
+function Spotlight({ cards, copy }) {
+  if (!cards.length) return null
   return (
-    <Section id="study-abroad" eyebrow="Explore" title="Study Abroad & Work Abroad">
+    <Section id="study-abroad" eyebrow={copy.eyebrow} title={copy.title} subtitle={copy.subtitle}>
       <div className="grid gap-6 md:grid-cols-2">
         {cards.map((card) => (
           <div key={card.label} className="group overflow-hidden rounded-2xl border border-navy-800/10 shadow-sm transition hover:shadow-xl dark:border-white/10">
-            <div className="overflow-hidden"><img src={card.img} alt={card.label} className="h-52 w-full object-cover transition duration-500 group-hover:scale-105" /></div>
+            <div className="overflow-hidden"><img src={card.image?.url || card.img} alt={card.label} className="h-52 w-full object-cover transition duration-500 group-hover:scale-105" /></div>
             <div className="bg-white p-6 dark:bg-navy-800">
               <h3 className="font-heading text-xl font-bold text-navy-900 dark:text-white">{card.label}</h3>
               <p className="mt-2 text-sm text-navy-800/70 dark:text-gray-300">{card.copy}</p>
-              <Link href="/contact" className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-green-600 transition hover:gap-2.5 hover:text-green-700">Explore Options <ArrowRight size={15} /></Link>
+              <Link href={card.href || '/contact'} className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-green-600 transition hover:gap-2.5 hover:text-green-700">{card.linkLabel || 'Explore Options'} <ArrowRight size={15} /></Link>
             </div>
           </div>
         ))}
@@ -529,9 +525,9 @@ function Spotlight() {
   )
 }
 
-function ProcessTimeline({ steps }) {
+function ProcessTimeline({ steps, copy }) {
   return (
-    <Section center bg="bg-gray-50 dark:bg-navy-900/40" eyebrow="How It Works" title="Visa Process Made Simple" subtitle="Clear steps from first call to visa approval.">
+    <Section center bg="bg-gray-50 dark:bg-navy-900/40" eyebrow={copy.eyebrow} title={copy.title} subtitle={copy.subtitle}>
       <div className="relative grid grid-cols-2 gap-y-12 md:grid-cols-4">
         <div className="absolute left-[12.5%] right-[12.5%] top-8 hidden h-0.5 bg-linear-to-r from-navy-800/20 via-green-600/40 to-navy-800/20 md:block" />
         {steps.map((p, i) => {
@@ -549,9 +545,9 @@ function ProcessTimeline({ steps }) {
   )
 }
 
-function SuccessStories({ testimonials }) {
+function SuccessStories({ testimonials, copy }) {
   return (
-    <Section id="success" center eyebrow="Client Wins" title="Success Stories" subtitle="Real approvals from clients who trusted us with their journey.">
+    <Section id="success" center eyebrow={copy.eyebrow} title={copy.title} subtitle={copy.subtitle}>
       <div className="grid gap-6 md:grid-cols-3">
         {testimonials.map((s) => (
           <div key={s.id || s.name} className="flex flex-col rounded-2xl border border-navy-800/10 bg-white p-6 shadow-sm transition hover:shadow-lg dark:border-white/10 dark:bg-navy-800">
@@ -586,10 +582,10 @@ function FaqItem({ faq }) {
   )
 }
 
-function Faqs({ faqs }) {
+function Faqs({ faqs, copy }) {
   if (!faqs.length) return null
   return (
-    <Section id="faqs" center eyebrow="Questions" title="Frequently Asked Questions" subtitle="Everything you need to know before you apply.">
+    <Section id="faqs" center eyebrow={copy.eyebrow} title={copy.title} subtitle={copy.subtitle}>
       <div className="mx-auto max-w-3xl divide-y divide-navy-800/10 dark:divide-white/10">
         {faqs.map((f) => <FaqItem key={f.id || f.question} faq={f} />)}
       </div>
@@ -656,7 +652,7 @@ function ContactSection({ contact, formCfg }) {
 
 const DEFAULT_VISA_ICON = { Student: 'GraduationCap', Work: 'Briefcase', Tourist: 'Plane', Business: 'Building2', PR: 'FileCheck2' }
 
-function CountryDetail({ country, services, steps }) {
+function CountryDetail({ country, services, steps, copy, shown }) {
   const types = country.visaTypes?.length ? country.visaTypes : ['Student', 'Work', 'Tourist']
   const serviceFor = (type) => services.find((s) => (s.title || '').toLowerCase().includes(type.toLowerCase()))
   return (
@@ -703,21 +699,21 @@ function CountryDetail({ country, services, steps }) {
         </div>
       </Section>
 
-      <ProcessTimeline steps={steps} />
-      <CTA />
+      {shown('process') && <ProcessTimeline steps={steps} copy={copy('process')} />}
+      {shown('cta') && <CTA copy={copy('cta')} />}
     </>
   )
 }
 
-function CTA() {
+function CTA({ copy }) {
   return (
     <section className="px-6 py-10">
       <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-linear-to-br from-navy-800 to-navy-900 px-6 py-16 text-center text-white ring-1 ring-white/10">
         <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-green-500/15 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-green-500/10 blur-3xl" />
         <div className="relative">
-          <h2 className="font-heading text-3xl font-bold md:text-4xl">Ready to Start Your Journey?</h2>
-          <p className="mx-auto mt-3 max-w-md text-white/70">Book a free consultation and let our experts map your visa path — no obligations, no hidden fees.</p>
+          <h2 className="font-heading text-3xl font-bold md:text-4xl">{copy.title}</h2>
+          {copy.subtitle && <p className="mx-auto mt-3 max-w-md text-white/70">{copy.subtitle}</p>}
           <QuickContactForm />
         </div>
       </div>
@@ -832,6 +828,11 @@ export default function SiteContent({ data, page = 'home', slug }) {
   const legalPage = page === 'page' ? pages.find((p) => p.slug === slug) : null
   const countryDoc = page === 'country' ? countries.find((c) => (c.code || '').toLowerCase() === (slug || '').toLowerCase()) : null
 
+  // Section heading copy: CMS row when present, shipped default otherwise.
+  const copy = (key) => sectionCopy(data.sections, key)
+  const shown = (key) => copy(key).isVisible
+  const spotlightCards = data.spotlight?.length ? data.spotlight : SPOTLIGHT_DEFAULTS
+
   return (
     <div className="min-h-screen bg-white font-body text-ink dark:bg-navy-900">
       <Navbar dark={dark} setDark={setDark} brand={brand} pages={pages} />
@@ -840,14 +841,14 @@ export default function SiteContent({ data, page = 'home', slug }) {
         <>
           <Hero hero={hero} formCfg={formCfg} />
           <StatsBar stats={stats} />
-          <VisaServices services={services} />
-          <WhyChooseUs features={features} />
-          <Countries countries={countries} />
-          <Spotlight />
-          <ProcessTimeline steps={steps} />
-          <SuccessStories testimonials={testimonials} />
-          <Faqs faqs={faqs} />
-          <CTA />
+          {shown('services') && <VisaServices services={services} copy={copy('services')} />}
+          {shown('features') && <WhyChooseUs features={features} copy={copy('features')} />}
+          {shown('countries') && <Countries countries={countries} copy={copy('countries')} />}
+          {shown('spotlight') && <Spotlight cards={spotlightCards} copy={copy('spotlight')} />}
+          {shown('process') && <ProcessTimeline steps={steps} copy={copy('process')} />}
+          {shown('testimonials') && <SuccessStories testimonials={testimonials} copy={copy('testimonials')} />}
+          {shown('faqs') && <Faqs faqs={faqs} copy={copy('faqs')} />}
+          {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
 
@@ -855,35 +856,35 @@ export default function SiteContent({ data, page = 'home', slug }) {
         <>
           <PageHeader crumb="About" title={aboutPage?.title || 'About Us'} subtitle="A decade of trusted, transparent visa expertise behind every application." />
           <PageBody html={aboutPage?.content} />
-          <WhyChooseUs features={features} />
-          <CTA />
+          {shown('features') && <WhyChooseUs features={features} copy={copy('features')} />}
+          {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
 
       {page === 'services' && (
         <>
           <PageHeader crumb="Services" title="Our Services" subtitle="Specialized support across every visa category." />
-          <VisaServices services={services} />
-          <Spotlight />
-          <ProcessTimeline steps={steps} />
-          <CTA />
+          {shown('services') && <VisaServices services={services} copy={copy('services')} />}
+          {shown('spotlight') && <Spotlight cards={spotlightCards} copy={copy('spotlight')} />}
+          {shown('process') && <ProcessTimeline steps={steps} copy={copy('process')} />}
+          {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
 
       {page === 'countries' && (
         <>
           <PageHeader crumb="Countries" title="Countries We Cover" subtitle="Trusted for visas to top destinations worldwide." />
-          <Countries countries={countries} />
-          <CTA />
+          {shown('countries') && <Countries countries={countries} copy={copy('countries')} />}
+          {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
 
       {page === 'success' && (
         <>
           <PageHeader crumb="Success" title="Success Stories" subtitle="Real approvals from clients who trusted us with their journey." />
-          <SuccessStories testimonials={testimonials} />
-          <Faqs faqs={faqs} />
-          <CTA />
+          {shown('testimonials') && <SuccessStories testimonials={testimonials} copy={copy('testimonials')} />}
+          {shown('faqs') && <Faqs faqs={faqs} copy={copy('faqs')} />}
+          {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
 
@@ -898,12 +899,12 @@ export default function SiteContent({ data, page = 'home', slug }) {
         <>
           <PageHeader crumb={legalPage.title} title={legalPage.title} />
           <PageBody html={legalPage.content} />
-          <CTA />
+          {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
 
       {page === 'country' && countryDoc && (
-        <CountryDetail country={countryDoc} services={services} steps={steps} />
+        <CountryDetail country={countryDoc} services={services} steps={steps} copy={copy} shown={shown} />
       )}
 
       <Footer brand={brand} contact={contact} socials={socials} pages={pages} />

@@ -42,7 +42,17 @@ function Field({ f, value, error }) {
   }
 
   let input
-  if (f.type === 'textarea' || f.type === 'richtext' || f.type === 'stringlist') {
+  if (f.type === 'select') {
+    input = (
+      <select id={f.name} name={f.name} defaultValue={value} className={inputClass}>
+        {!f.required && <option value="">—</option>}
+        {(f.options || []).map((opt) => {
+          const [val, label] = Array.isArray(opt) ? opt : [opt, opt]
+          return <option key={val} value={val}>{label}</option>
+        })}
+      </select>
+    )
+  } else if (f.type === 'textarea' || f.type === 'richtext' || f.type === 'stringlist') {
     input = <textarea id={f.name} name={f.name} rows={f.type === 'richtext' ? 6 : 3} defaultValue={value} className={inputClass} />
   } else if (f.type === 'number') {
     input = <input id={f.name} name={f.name} type="number" step="any" defaultValue={value} className={inputClass} />

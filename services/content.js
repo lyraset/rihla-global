@@ -7,6 +7,8 @@ import { Testimonial } from '../models/Testimonial.js'
 import { Faq } from '../models/Faq.js'
 import { Country } from '../models/Country.js'
 import { Page } from '../models/Page.js'
+import { PageSection } from '../models/PageSection.js'
+import { SpotlightCard } from '../models/SpotlightCard.js'
 
 /**
  * Direct DB reads (no unstable_cache). The public pages are `force-dynamic`, so
@@ -27,6 +29,13 @@ export const getStats = publishedByOrder(Stat)
 export const getTestimonials = publishedByOrder(Testimonial)
 export const getFaqs = publishedByOrder(Faq)
 export const getCountries = publishedByOrder(Country)
+export const getSpotlightCards = publishedByOrder(SpotlightCard)
+
+/** Section heading copy. Not filtered by isPublished — visibility is per-row. */
+export async function getPageSections() {
+  await connectDB()
+  return serialize(await PageSection.find().sort({ order: 1 }))
+}
 
 export async function getPages() {
   await connectDB()

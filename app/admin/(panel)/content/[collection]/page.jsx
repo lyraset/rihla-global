@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { getCollection } from '../../../../../lib/cms/collections.js'
-import { listEntities } from '../../../../../services/cms.js'
+import { listEntities, ensureDefaultRows } from '../../../../../services/cms.js'
 import EntityListActions from '../../../../../components/admin/EntityListActions.jsx'
 
 export const dynamic = 'force-dynamic'
@@ -31,6 +31,9 @@ export default async function CollectionListPage({ params }) {
   let items = []
   let dbError = false
   try {
+    // Collections that mirror fixed render sites seed themselves here, so the
+    // first visit shows the live copy as editable rows rather than an empty list.
+    if (col.ensureDefaults) await ensureDefaultRows(col.model, col.ensureDefaults)
     items = (await listEntities(col.model, col.defaultSort)).map((d) => d.toJSON())
   } catch {
     dbError = true
