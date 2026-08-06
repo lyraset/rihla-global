@@ -8,6 +8,15 @@ export default function ContentIndexPage() {
     <div>
       <h1 className="mb-5 font-heading text-2xl font-bold text-navy-900">Content</h1>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        {/* Not a collection — a scoped view onto SiteSettings.hero, listed here
+            because editors look for home-page copy under Content. */}
+        <Link
+          href="/admin/content/hero"
+          className="rounded-2xl border border-navy-800/10 bg-white p-5 transition hover:border-green-600/30 hover:shadow-md"
+        >
+          <div className="font-heading font-semibold text-navy-900">Home hero</div>
+          <div className="mt-1 text-sm text-navy-800/50">Headline, buttons & background</div>
+        </Link>
         {CMS_NAV.map(({ key, label }) => (
           <Link
             key={key}

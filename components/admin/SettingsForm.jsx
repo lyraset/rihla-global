@@ -51,12 +51,21 @@ function SettingField({ f, value }) {
   )
 }
 
-export default function SettingsForm({ settings }) {
+/**
+ * @param {object}   props
+ * @param {object}   props.settings   the SiteSettings document
+ * @param {Array}   [props.sections]  groups to render; defaults to all of them
+ * @param {string}  [props.scope]     when set, the save touches only this group
+ * @param {string}  [props.saveLabel]
+ */
+export default function SettingsForm({ settings, sections, scope, saveLabel = 'Save settings' }) {
   const [state, action, pending] = useActionState(saveSettingsAction, {})
+  const groups = sections || SETTINGS_SECTIONS
 
   return (
     <form action={action} className="space-y-6 pb-20">
-      {SETTINGS_SECTIONS.map((section) => (
+      {scope && <input type="hidden" name="__section" value={scope} />}
+      {groups.map((section) => (
         <section key={section.title} className="rounded-2xl border border-navy-800/10 bg-white p-6">
           <h2 className="mb-4 font-heading font-semibold text-navy-900">{section.title}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -68,7 +77,7 @@ export default function SettingsForm({ settings }) {
       ))}
       <div className="sticky bottom-0 -mx-6 flex items-center gap-3 border-t border-navy-800/10 bg-gray-50/95 px-6 py-3 backdrop-blur">
         <button type="submit" disabled={pending} className="rounded-lg bg-green-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-70">
-          {pending ? 'Saving…' : 'Save settings'}
+          {pending ? 'Saving…' : saveLabel}
         </button>
         {state?.ok && <span className="text-sm font-medium text-green-600">Saved ✓</span>}
         {state?.error && <span role="alert" className="text-sm font-medium text-red-600">{state.error}</span>}

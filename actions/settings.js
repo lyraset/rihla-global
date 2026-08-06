@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireRole } from '../lib/session.js'
-import { SETTINGS_FIELDS } from '../lib/cms/settings-fields.js'
+import { resolveSettingsFields } from '../lib/cms/settings-fields.js'
 import { connectDB } from '../lib/db.js'
 import { SiteSettings } from '../models/SiteSettings.js'
 import { writeAudit } from '../services/audit.js'
@@ -11,10 +11,16 @@ import { revalidateTags, CACHE_TAGS } from '../lib/cache.js'
 export async function saveSettingsAction(_prevState, formData) {
   const session = await requireRole(['superadmin', 'editor'])
 
+  // A scoped editor (e.g. Content → Home hero) submits only its own group. Save
+  // must then touch only those fields — iterating every field would read the
+  // absent inputs as empty strings and wipe unrelated settings.
+  const fields = resolveSettingsFields(String(formData.get('__section') || ''))
+  if (!fields) return { ok: false, error: 'Unknown settings section.' }
+
   // Build a $set with dot-path keys straight onto the SiteSettings document.
   const set = { key: 'main' }
   const unset = {}
-  for (const f of SETTINGS_FIELDS) {
+  for (const f of fields) {
     if (f.type === 'boolean') {
       set[f.name] = formData.get(f.name) === 'on'
     } else if (f.type === 'image') {
@@ -46,5 +52,6 @@ export async function saveSettingsAction(_prevState, formData) {
 
   revalidateTags([CACHE_TAGS.settings])
   revalidatePath('/admin/settings')
+  revalidatePath('/admin/content/hero')
   return { ok: true, savedAt: Date.now() }
 }
