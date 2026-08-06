@@ -65,7 +65,10 @@ const siteSettingsSchema = new mongoose.Schema(
       showFloatingButton: { type: Boolean, default: true },
     },
     liveChat: {
-      provider: { type: String, enum: ['none', 'crisp', 'tawk', 'custom'], default: 'none' },
+      // 'ai' is the built-in Claude-powered assistant (see lib/chat.js); the
+      // others are third-party embeds kept for future use.
+      provider: { type: String, enum: ['none', 'ai', 'crisp', 'tawk', 'custom'], default: 'ai' },
+      enabled: { type: Boolean, default: true },
       embedId: String,
     },
     analytics: { gaMeasurementId: String, gtmId: String, metaPixelId: String, clarityId: String },

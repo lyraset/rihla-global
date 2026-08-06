@@ -16,6 +16,7 @@
     "migrate:images": "node --env-file=.env.local scripts/migrate-images.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "bcryptjs": "^3.0.3",

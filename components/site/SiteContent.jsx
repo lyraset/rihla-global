@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { sectionCopy, SPOTLIGHT_DEFAULTS } from '../../lib/cms/section-defaults.js'
+import ChatWidget from './ChatWidget.jsx'
 import {
   GraduationCap, Briefcase, Plane, Building2, FileCheck2,
   ShieldCheck, Globe2, Award, Compass, Sparkles,
@@ -787,17 +788,10 @@ function Footer({ brand, contact, socials, pages }) {
   )
 }
 
-function FloatingButtons({ waNumber, waEnabled }) {
-  const [chatOpen, setChatOpen] = useState(false)
+function FloatingButtons({ waNumber, waEnabled, chatEnabled }) {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-      {chatOpen && (
-        <div className="w-64 rounded-2xl border border-navy-800/10 bg-white p-4 text-sm shadow-xl dark:bg-navy-800">
-          <p className="font-semibold text-navy-900 dark:text-white">Live Chat</p>
-          <p className="mt-1 text-navy-800/70 dark:text-gray-300">Chat with our team — connect a live-chat provider here.</p>
-        </div>
-      )}
-      <button onClick={() => setChatOpen(!chatOpen)} className="grid h-12 w-12 place-items-center rounded-full bg-navy-800 text-white shadow-lg" aria-label="Live chat"><MessageCircle size={20} /></button>
+      {chatEnabled && <ChatWidget waNumber={waNumber} />}
       {waEnabled && (
         <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noreferrer" className="grid h-12 w-12 place-items-center rounded-full bg-green-500 text-white shadow-lg" aria-label="WhatsApp"><Phone size={20} /></a>
       )}
@@ -908,7 +902,7 @@ export default function SiteContent({ data, page = 'home', slug }) {
       )}
 
       <Footer brand={brand} contact={contact} socials={socials} pages={pages} />
-      <FloatingButtons waNumber={waNumber} waEnabled={waEnabled} />
+      <FloatingButtons waNumber={waNumber} waEnabled={waEnabled} chatEnabled={data.chatEnabled} />
     </div>
   )
 }
