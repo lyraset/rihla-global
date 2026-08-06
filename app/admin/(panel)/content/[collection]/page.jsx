@@ -33,7 +33,7 @@ export default async function CollectionListPage({ params }) {
   try {
     // Collections that mirror fixed render sites seed themselves here, so the
     // first visit shows the live copy as editable rows rather than an empty list.
-    if (col.ensureDefaults) await ensureDefaultRows(col.model, col.ensureDefaults)
+    if (col.ensureDefaults) await ensureDefaultRows(collection, col.model, col.ensureDefaults)
     items = (await listEntities(col.model, col.defaultSort)).map((d) => d.toJSON())
   } catch {
     dbError = true
