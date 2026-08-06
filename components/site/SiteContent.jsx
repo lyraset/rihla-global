@@ -339,11 +339,18 @@ function Hero({ hero, formCfg }) {
             <ShieldCheck size={14} /> {hero.badge || 'Licensed Visa & Immigration Consultants'}
           </span>
           <h1 className="animate-fade-up mt-5 font-heading text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl" style={{ animationDelay: '0.1s' }}>
-            {hero.headline || 'Your Gateway to'} <span className="text-green-400">{hero.headlineAccent || 'Global Opportunities'}</span>
+            {hero.headline || 'Trusted Visa Consultant in Islamabad'}
           </h1>
-          <p className="animate-fade-up mt-5 max-w-lg text-lg text-white/75" style={{ animationDelay: '0.2s' }}>
-            {hero.subheadline || 'Expert guidance for student, work, tourist, business and PR visas — backed by a 98% success rate and complete transparency at every step.'}
+          {/* Tagline, not part of the H1 — one heading per page keeps the
+              primary keyword unambiguous for search engines. */}
+          <p className="animate-fade-up mt-3 font-heading text-xl font-semibold text-green-400 md:text-2xl" style={{ animationDelay: '0.15s' }}>
+            {hero.headlineAccent || 'Your Gateway to Global Opportunities'}
           </p>
+          {hero.subheadline && (
+            <p className="animate-fade-up mt-4 max-w-lg text-base text-white/70" style={{ animationDelay: '0.2s' }}>
+              {hero.subheadline}
+            </p>
+          )}
           <div className="animate-fade-up mt-8 flex flex-wrap items-center gap-3" style={{ animationDelay: '0.3s' }}>
             <Link href={hero.primaryCtaHref || '/contact'} className="inline-flex items-center gap-2 rounded-full bg-green-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-green-900/30 transition hover:bg-green-700">
               {hero.primaryCtaLabel || 'Book Free Consultation'} <ArrowRight size={16} />
