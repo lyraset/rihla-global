@@ -20,6 +20,64 @@ export async function createEntity(Model, doc) {
 }
 
 /**
+ * One-time expansion of section copy from site-wide to per-page.
+ *
+ * Rows written before scoping have no `page` and drove every page that renders
+ * that section. Each is fanned out into one row per page it actually appeared
+ * on, carrying the same copy — so nothing changes visually, but each page is
+ * now independently editable. Idempotent: once no unscoped rows remain it is a
+ * no-op, and existing (page, key) pairs are never overwritten.
+ */
+export async function migratePageSections() {
+  await connectDB()
+  const { PageSection } = await import('../models/PageSection.js')
+  const { PAGE_SECTIONS } = await import('../lib/cms/section-defaults.js')
+
+  // The old schema had a unique index on `key` alone. It has to go before the
+  // fan-out, or the second row for any shared section (every CTA after the
+  // first) is rejected as a duplicate.
+  try {
+    const existing = await PageSection.collection.indexes()
+    if (existing.some((i) => i.name === 'key_1')) {
+      await PageSection.collection.dropIndex('key_1')
+    }
+  } catch {
+    /* already dropped, or collection not created yet */
+  }
+
+  const legacy = await PageSection.find({
+    $or: [{ page: { $exists: false } }, { page: null }, { page: '' }],
+  }).lean()
+  if (!legacy.length) return 0
+
+  const scoped = new Set(
+    (await PageSection.find({ page: { $nin: [null, ''] } }, { page: 1, key: 1 }).lean()).map(
+      (r) => `${r.page}:${r.key}`,
+    ),
+  )
+
+  const rows = []
+  for (const row of legacy) {
+    for (const [page, keys] of Object.entries(PAGE_SECTIONS)) {
+      if (!keys.includes(row.key) || scoped.has(`${page}:${row.key}`)) continue
+      rows.push({
+        page,
+        key: row.key,
+        eyebrow: row.eyebrow,
+        title: row.title,
+        subtitle: row.subtitle,
+        isVisible: row.isVisible !== false,
+        order: row.order ?? 0,
+      })
+    }
+  }
+
+  if (rows.length) await PageSection.insertMany(rows, { ordered: false })
+  await PageSection.deleteMany({ _id: { $in: legacy.map((r) => r._id) } })
+  return rows.length
+}
+
+/**
  * Plant a collection's shipped default rows — once, ever.
  *
  * Used by collections whose rows map onto fixed render sites (page sections,

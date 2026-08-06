@@ -829,8 +829,10 @@ export default function SiteContent({ data, page = 'home', slug }) {
   const legalPage = page === 'page' ? pages.find((p) => p.slug === slug) : null
   const countryDoc = page === 'country' ? countries.find((c) => (c.code || '').toLowerCase() === (slug || '').toLowerCase()) : null
 
-  // Section heading copy: CMS row when present, shipped default otherwise.
-  const copy = (key) => sectionCopy(data.sections, key)
+  // Section heading copy, scoped to the page being rendered — editing Home's
+  // wording must not touch About, Services or any other page that shares the
+  // same section component.
+  const copy = (key) => sectionCopy(data.sections, key, page)
   const shown = (key) => copy(key).isVisible
   const spotlightCards = data.spotlight?.length ? data.spotlight : SPOTLIGHT_DEFAULTS
 

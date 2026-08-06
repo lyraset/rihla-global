@@ -4,16 +4,21 @@ import { applyToJSON, model } from './shared.js'
 const { ObjectId } = mongoose.Schema.Types
 
 /**
- * Editable heading copy for a named site section (services, faqs, cta, …).
+ * Editable heading copy for one section on one page.
  *
  * The items inside each section already live in their own collections; this
  * holds only the wrapper copy that was previously hardcoded in SiteContent.
- * `key` ties a row to a render site, so it is unique and drawn from a fixed
- * list — a row with an unrecognised key is simply ignored.
+ *
+ * Scoped by `page` as well as `key` because the section components are shared —
+ * the services block renders on both Home and Services, the CTA on nearly every
+ * page. Keying on `key` alone meant editing Home's wording silently rewrote the
+ * other pages too. The pair is unique; a row whose pair isn't rendered anywhere
+ * is simply ignored.
  */
 const pageSectionSchema = new mongoose.Schema(
   {
-    key: { type: String, required: true, unique: true, index: true },
+    page: { type: String, required: true, index: true },
+    key: { type: String, required: true, index: true },
     eyebrow: String,
     title: String,
     subtitle: String,
@@ -23,6 +28,8 @@ const pageSectionSchema = new mongoose.Schema(
   },
   { timestamps: true },
 )
+
+pageSectionSchema.index({ page: 1, key: 1 }, { unique: true })
 
 applyToJSON(pageSectionSchema)
 

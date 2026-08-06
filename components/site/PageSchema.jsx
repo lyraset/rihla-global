@@ -28,7 +28,7 @@ export default function PageSchema({ data = {}, page, slug }) {
   // A section hidden in Admin → Content → Page sections is not on the page, so
   // its markup must go too: describing content a visitor cannot see is a
   // structured-data policy violation.
-  const visible = (key) => sectionCopy(data.sections, key).isVisible
+  const visible = (key) => sectionCopy(data.sections, key, page).isVisible
   const ifVisible = (key, node) => (visible(key) ? node : undefined)
 
   switch (page) {

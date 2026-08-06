@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { getCollection } from '../../../../../lib/cms/collections.js'
-import { listEntities, ensureDefaultRows } from '../../../../../services/cms.js'
+import { listEntities, ensureDefaultRows, migratePageSections } from '../../../../../services/cms.js'
 import EntityListActions from '../../../../../components/admin/EntityListActions.jsx'
 
 export const dynamic = 'force-dynamic'
@@ -19,7 +19,9 @@ function Cell({ col, item, name }) {
     return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${v ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>{v ? 'Yes' : 'No'}</span>
   }
   if (v == null || v === '') return <span className="text-navy-800/30">—</span>
-  const text = String(v)
+  // A select stores its value ('home') but the list should read like the form.
+  const option = f?.type === 'select' && (f.options || []).find((o) => Array.isArray(o) && o[0] === v)
+  const text = option ? option[1] : String(v)
   return <span className={name === col.titleField ? 'font-medium text-navy-900' : 'text-navy-800/70'}>{text.length > 60 ? text.slice(0, 60) + '…' : text}</span>
 }
 
@@ -31,6 +33,8 @@ export default async function CollectionListPage({ params }) {
   let items = []
   let dbError = false
   try {
+    // Runs before seeding: fans site-wide section copy out into per-page rows.
+    if (col.migrate === 'pageSections') await migratePageSections()
     // Collections that mirror fixed render sites seed themselves here, so the
     // first visit shows the live copy as editable rows rather than an empty list.
     if (col.ensureDefaults) await ensureDefaultRows(collection, col.model, col.ensureDefaults)
