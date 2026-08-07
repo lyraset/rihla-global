@@ -47,26 +47,10 @@ export default function PageSchema({ data = {}, page, slug }) {
       )
       break
 
-    case 'services':
-      nodes.push(
-        webPageSchema({ origin, path: '/services', title: 'Our Services' }),
-        crumbs([{ name: 'Services', path: '/services' }]),
-        ifVisible('services', serviceListSchema(data.services, origin)),
-      )
-      break
-
     case 'countries':
       nodes.push(
         webPageSchema({ origin, path: '/countries', title: 'Countries We Cover' }),
         crumbs([{ name: 'Countries', path: '/countries' }]),
-      )
-      break
-
-    case 'success':
-      nodes.push(
-        webPageSchema({ origin, path: '/success', title: 'Success Stories' }),
-        crumbs([{ name: 'Success', path: '/success' }]),
-        ifVisible('faqs', faqSchema(data.faqs)),
       )
       break
 

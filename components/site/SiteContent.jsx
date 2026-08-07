@@ -24,12 +24,9 @@ const iconByName = (name) => ICONS[name] || Sparkles
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
-  { label: 'Services', href: '/services' },
   { label: 'Countries', href: '/countries' },
-  { label: 'Success', href: '/success' },
   { label: 'Contact', href: '/contact' },
 ]
-const pageLabel = (p) => (p.slug || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
 // ---- fallbacks used only when a collection is empty (or DB is unavailable) ----
 const DEFAULT_STATS = [
@@ -109,7 +106,7 @@ function IconBadge({ Icon, className = '' }) {
   )
 }
 
-function Navbar({ dark, setDark, brand, pages }) {
+function Navbar({ dark, setDark, brand }) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
@@ -118,42 +115,121 @@ function Navbar({ dark, setDark, brand, pages }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
   const pathname = usePathname()
-  // Published pages become independent nav links (their own routes); skip any
-  // whose label already exists as a section link (e.g. About).
-  const navPages = (pages || [])
-    .map((p) => ({ label: pageLabel(p), href: `/${p.slug}` }))
-    .filter((np) => !NAV_LINKS.some((l) => l.label.toLowerCase() === np.label.toLowerCase()))
-  const links = [...NAV_LINKS, ...navPages]
+  // Close the mobile sheet on navigation — otherwise it stays open over the new
+  // page whenever a route changes by any route other than tapping a link.
+  useEffect(() => setOpen(false), [pathname])
+
+  // The main nav is the fixed list only. Legal pages (privacy, terms) still
+  // have their own routes and are linked from the footer, but they don't belong
+  // in the primary navigation.
+  const links = NAV_LINKS
   const isActive = (href) => (href === '/' ? pathname === '/' : pathname.startsWith(href))
+
   return (
-    <header className={`sticky top-0 z-40 border-b backdrop-blur-md transition-all ${scrolled ? 'border-navy-800/10 bg-white/85 shadow-sm dark:border-white/10 dark:bg-navy-900/85' : 'border-transparent bg-white/70 dark:bg-navy-900/70'}`}>
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        <Link href="/" className="flex items-center gap-2.5">
-          <img src="/Rihla logo.png" alt={brand.name} className="h-12 w-12 object-contain" />
+    <header
+      className={`sticky top-0 z-40 border-b backdrop-blur-xl transition-all duration-300 ${
+        scrolled
+          ? 'border-navy-800/10 bg-white/90 shadow-[0_1px_20px_-8px_rgba(10,25,60,0.35)] dark:border-white/10 dark:bg-navy-900/90'
+          : 'border-transparent bg-white/70 dark:bg-navy-900/70'
+      }`}
+    >
+      <div
+        className={`relative mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-300 ${
+          scrolled ? 'py-2' : 'py-3'
+        }`}
+      >
+        <Link href="/" className="group flex items-center gap-2.5">
+          <img
+            src="/Rihla logo.png"
+            alt={brand.name}
+            className={`object-contain transition-all duration-300 group-hover:scale-105 ${scrolled ? 'h-10 w-10' : 'h-12 w-12'}`}
+          />
           <div className="leading-tight">
             <div className="font-heading text-lg font-bold text-navy-900 dark:text-white">{brand.name}</div>
             <div className="text-[11px] font-medium tracking-wide text-navy-800/70 dark:text-gray-300">{brand.tagline}</div>
           </div>
         </Link>
-        <nav className="hidden items-center gap-5 lg:flex">
-          {links.map((l) => (
-            <Link key={l.href} href={l.href} className={`text-sm font-medium transition-colors ${isActive(l.href) ? 'text-green-600 dark:text-green-400' : 'text-navy-800 hover:text-green-600 dark:text-gray-200 dark:hover:text-green-400'}`}>{l.label}</Link>
-          ))}
+
+        {/* Centred independently of the logo and actions, so an odd number of
+            short links can't leave the bar looking lopsided. */}
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-0.5 rounded-full border border-navy-800/10 bg-white/60 p-1 shadow-sm lg:flex dark:border-white/10 dark:bg-white/5">
+          {links.map((l) => {
+            const active = isActive(l.href)
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={active ? 'page' : undefined}
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
+                  active
+                    ? 'bg-white text-green-700 shadow-sm ring-1 ring-navy-800/5 dark:bg-white/15 dark:text-green-400 dark:ring-white/10'
+                    : 'text-navy-800/80 hover:bg-navy-800/5 hover:text-navy-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white'
+                }`}
+              >
+                {l.label}
+              </Link>
+            )
+          })}
         </nav>
-        <div className="flex items-center gap-2.5">
-          <button aria-label="Toggle dark mode" onClick={() => setDark(!dark)} className="grid h-9 w-9 place-items-center rounded-full border border-navy-800/15 text-navy-800 transition hover:border-green-600/40 hover:text-green-600 dark:border-white/20 dark:text-white">
+
+        <div className="flex items-center gap-2">
+          <button
+            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            onClick={() => setDark(!dark)}
+            className="grid h-9 w-9 place-items-center rounded-full border border-navy-800/15 text-navy-800 transition-all duration-200 hover:rotate-12 hover:border-green-600/40 hover:text-green-600 dark:border-white/20 dark:text-white dark:hover:border-green-400/40"
+          >
             {dark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          <Link href="/contact" className="hidden rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green-900/20 transition hover:bg-green-700 sm:block">Book Consultation</Link>
-          <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
+          {/* The single solid-green element on the bar — the active nav pill is
+              deliberately white so it never competes with this. */}
+          <Link
+            href="/contact"
+            className="group hidden items-center gap-1.5 rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-green-900/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-xl hover:shadow-green-900/25 sm:inline-flex"
+          >
+            Book Consultation
+            <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
+          <button
+            className="grid h-9 w-9 place-items-center rounded-full border border-navy-800/15 text-navy-800 transition hover:border-green-600/40 hover:text-green-600 lg:hidden dark:border-white/20 dark:text-white"
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+          >
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
       </div>
+
       {open && (
-        <div className="flex flex-col gap-1 border-t border-navy-800/10 bg-white px-6 py-3 lg:hidden dark:border-white/10 dark:bg-navy-900">
-          {links.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className={`rounded-lg px-2 py-2 ${isActive(l.href) ? 'text-green-600' : 'text-navy-800 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5'}`}>{l.label}</Link>
-          ))}
-          <Link href="/contact" onClick={() => setOpen(false)} className="mt-2 rounded-full bg-green-600 px-5 py-2.5 text-center text-sm font-semibold text-white">Book Consultation</Link>
+        <div className="animate-fade-up border-t border-navy-800/10 bg-white px-6 py-4 lg:hidden dark:border-white/10 dark:bg-navy-900">
+          <div className="flex flex-col gap-1">
+            {links.map((l) => {
+              const active = isActive(l.href)
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  aria-current={active ? 'page' : undefined}
+                  onClick={() => setOpen(false)}
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition ${
+                    active
+                      ? 'bg-green-50 text-green-700 dark:bg-white/10 dark:text-green-400'
+                      : 'text-navy-800 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5'
+                  }`}
+                >
+                  {l.label}
+                  <ChevronRight size={15} className={active ? 'opacity-70' : 'opacity-30'} />
+                </Link>
+              )
+            })}
+          </div>
+          <Link
+            href="/contact"
+            onClick={() => setOpen(false)}
+            className="mt-3 flex items-center justify-center gap-1.5 rounded-full bg-green-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-green-900/20 transition hover:bg-green-700"
+          >
+            Book Consultation <ArrowRight size={15} />
+          </Link>
         </div>
       )}
     </header>
@@ -355,7 +431,7 @@ function Hero({ hero, formCfg }) {
             <Link href={hero.primaryCtaHref || '/contact'} className="inline-flex items-center gap-2 rounded-full bg-green-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-green-900/30 transition hover:bg-green-700">
               {hero.primaryCtaLabel || 'Book Free Consultation'} <ArrowRight size={16} />
             </Link>
-            <Link href={hero.secondaryCtaHref || '/services'} className="rounded-full border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10">
+            <Link href={hero.secondaryCtaHref || '/contact'} className="rounded-full border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10">
               {hero.secondaryCtaLabel || 'Explore Services'}
             </Link>
           </div>
@@ -844,7 +920,7 @@ export default function SiteContent({ data, page = 'home', slug }) {
 
   return (
     <div className="min-h-screen bg-white font-body text-ink dark:bg-navy-900">
-      <Navbar dark={dark} setDark={setDark} brand={brand} pages={pages} />
+      <Navbar dark={dark} setDark={setDark} brand={brand} />
 
       {page === 'home' && (
         <>
@@ -870,15 +946,6 @@ export default function SiteContent({ data, page = 'home', slug }) {
         </>
       )}
 
-      {page === 'services' && (
-        <>
-          <PageHeader crumb="Services" title="Our Services" subtitle="Specialized support across every visa category." />
-          {shown('services') && <VisaServices services={pick('services', services)} copy={copy('services')} />}
-          {shown('spotlight') && <Spotlight cards={pick('spotlight', spotlightCards)} copy={copy('spotlight')} />}
-          {shown('process') && <ProcessTimeline steps={pick('process', steps)} copy={copy('process')} />}
-          {shown('cta') && <CTA copy={copy('cta')} />}
-        </>
-      )}
 
       {page === 'countries' && (
         <>
@@ -888,14 +955,6 @@ export default function SiteContent({ data, page = 'home', slug }) {
         </>
       )}
 
-      {page === 'success' && (
-        <>
-          <PageHeader crumb="Success" title="Success Stories" subtitle="Real approvals from clients who trusted us with their journey." />
-          {shown('testimonials') && <SuccessStories testimonials={pick('testimonials', testimonials)} copy={copy('testimonials')} />}
-          {shown('faqs') && <Faqs faqs={pick('faqs', faqs)} copy={copy('faqs')} />}
-          {shown('cta') && <CTA copy={copy('cta')} />}
-        </>
-      )}
 
       {page === 'contact' && (
         <>

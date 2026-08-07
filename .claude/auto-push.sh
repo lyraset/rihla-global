@@ -9,6 +9,14 @@ cd "$repo" || exit 0
 
 msg() { printf '{"systemMessage": "%s"}\n' "$1"; }
 
+# Kill switch. While this file exists nothing is committed or pushed — for work
+# you want to review locally before it reaches the live site.
+# Re-enable with:  rm ".claude/no-autopush"
+if [ -f "$repo/.claude/no-autopush" ]; then
+  msg "auto-push PAUSED (.claude/no-autopush present) — nothing committed or pushed"
+  exit 0
+fi
+
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 if [ "$branch" != "main" ]; then
   exit 0
