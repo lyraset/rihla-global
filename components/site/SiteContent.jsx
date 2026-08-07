@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { sectionCopy, SPOTLIGHT_DEFAULTS } from '../../lib/cms/section-defaults.js'
+import { sectionCopy, pickItems, SPOTLIGHT_DEFAULTS } from '../../lib/cms/section-defaults.js'
 import ChatWidget from './ChatWidget.jsx'
 import {
   GraduationCap, Briefcase, Plane, Building2, FileCheck2,
@@ -660,7 +660,7 @@ function ContactSection({ contact, formCfg }) {
 
 const DEFAULT_VISA_ICON = { Student: 'GraduationCap', Work: 'Briefcase', Tourist: 'Plane', Business: 'Building2', PR: 'FileCheck2' }
 
-function CountryDetail({ country, services, steps, copy, shown }) {
+function CountryDetail({ country, services, steps, copy, shown, pick }) {
   const types = country.visaTypes?.length ? country.visaTypes : ['Student', 'Work', 'Tourist']
   const serviceFor = (type) => services.find((s) => (s.title || '').toLowerCase().includes(type.toLowerCase()))
   return (
@@ -707,7 +707,7 @@ function CountryDetail({ country, services, steps, copy, shown }) {
         </div>
       </Section>
 
-      {shown('process') && <ProcessTimeline steps={steps} copy={copy('process')} />}
+      {shown('process') && <ProcessTimeline steps={pick('process', steps)} copy={copy('process')} />}
       {shown('cta') && <CTA copy={copy('cta')} />}
     </>
   )
@@ -834,6 +834,8 @@ export default function SiteContent({ data, page = 'home', slug }) {
   // same section component.
   const copy = (key) => sectionCopy(data.sections, key, page)
   const shown = (key) => copy(key).isVisible
+  // Which items this page shows from the shared collection.
+  const pick = (key, items) => pickItems(items, copy(key))
   const spotlightCards = data.spotlight?.length ? data.spotlight : SPOTLIGHT_DEFAULTS
 
   return (
@@ -844,13 +846,13 @@ export default function SiteContent({ data, page = 'home', slug }) {
         <>
           <Hero hero={hero} formCfg={formCfg} />
           <StatsBar stats={stats} />
-          {shown('services') && <VisaServices services={services} copy={copy('services')} />}
-          {shown('features') && <WhyChooseUs features={features} copy={copy('features')} />}
-          {shown('countries') && <Countries countries={countries} copy={copy('countries')} />}
-          {shown('spotlight') && <Spotlight cards={spotlightCards} copy={copy('spotlight')} />}
-          {shown('process') && <ProcessTimeline steps={steps} copy={copy('process')} />}
-          {shown('testimonials') && <SuccessStories testimonials={testimonials} copy={copy('testimonials')} />}
-          {shown('faqs') && <Faqs faqs={faqs} copy={copy('faqs')} />}
+          {shown('services') && <VisaServices services={pick('services', services)} copy={copy('services')} />}
+          {shown('features') && <WhyChooseUs features={pick('features', features)} copy={copy('features')} />}
+          {shown('countries') && <Countries countries={pick('countries', countries)} copy={copy('countries')} />}
+          {shown('spotlight') && <Spotlight cards={pick('spotlight', spotlightCards)} copy={copy('spotlight')} />}
+          {shown('process') && <ProcessTimeline steps={pick('process', steps)} copy={copy('process')} />}
+          {shown('testimonials') && <SuccessStories testimonials={pick('testimonials', testimonials)} copy={copy('testimonials')} />}
+          {shown('faqs') && <Faqs faqs={pick('faqs', faqs)} copy={copy('faqs')} />}
           {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
@@ -859,7 +861,7 @@ export default function SiteContent({ data, page = 'home', slug }) {
         <>
           <PageHeader crumb="About" title={aboutPage?.title || 'About Us'} subtitle="A decade of trusted, transparent visa expertise behind every application." />
           <PageBody html={aboutPage?.content} />
-          {shown('features') && <WhyChooseUs features={features} copy={copy('features')} />}
+          {shown('features') && <WhyChooseUs features={pick('features', features)} copy={copy('features')} />}
           {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
@@ -867,9 +869,9 @@ export default function SiteContent({ data, page = 'home', slug }) {
       {page === 'services' && (
         <>
           <PageHeader crumb="Services" title="Our Services" subtitle="Specialized support across every visa category." />
-          {shown('services') && <VisaServices services={services} copy={copy('services')} />}
-          {shown('spotlight') && <Spotlight cards={spotlightCards} copy={copy('spotlight')} />}
-          {shown('process') && <ProcessTimeline steps={steps} copy={copy('process')} />}
+          {shown('services') && <VisaServices services={pick('services', services)} copy={copy('services')} />}
+          {shown('spotlight') && <Spotlight cards={pick('spotlight', spotlightCards)} copy={copy('spotlight')} />}
+          {shown('process') && <ProcessTimeline steps={pick('process', steps)} copy={copy('process')} />}
           {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
@@ -877,7 +879,7 @@ export default function SiteContent({ data, page = 'home', slug }) {
       {page === 'countries' && (
         <>
           <PageHeader crumb="Countries" title="Countries We Cover" subtitle="Trusted for visas to top destinations worldwide." />
-          {shown('countries') && <Countries countries={countries} copy={copy('countries')} />}
+          {shown('countries') && <Countries countries={pick('countries', countries)} copy={copy('countries')} />}
           {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
@@ -885,8 +887,8 @@ export default function SiteContent({ data, page = 'home', slug }) {
       {page === 'success' && (
         <>
           <PageHeader crumb="Success" title="Success Stories" subtitle="Real approvals from clients who trusted us with their journey." />
-          {shown('testimonials') && <SuccessStories testimonials={testimonials} copy={copy('testimonials')} />}
-          {shown('faqs') && <Faqs faqs={faqs} copy={copy('faqs')} />}
+          {shown('testimonials') && <SuccessStories testimonials={pick('testimonials', testimonials)} copy={copy('testimonials')} />}
+          {shown('faqs') && <Faqs faqs={pick('faqs', faqs)} copy={copy('faqs')} />}
           {shown('cta') && <CTA copy={copy('cta')} />}
         </>
       )}
@@ -907,7 +909,7 @@ export default function SiteContent({ data, page = 'home', slug }) {
       )}
 
       {page === 'country' && countryDoc && (
-        <CountryDetail country={countryDoc} services={services} steps={steps} copy={copy} shown={shown} />
+        <CountryDetail country={countryDoc} services={services} steps={steps} copy={copy} shown={shown} pick={pick} />
       )}
 
       <Footer brand={brand} contact={contact} socials={socials} pages={pages} />

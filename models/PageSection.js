@@ -23,6 +23,11 @@ const pageSectionSchema = new mongoose.Schema(
     title: String,
     subtitle: String,
     isVisible: { type: Boolean, default: true },
+    // Which of the section's items this page shows. The items themselves stay
+    // in one shared collection — only the selection is per-page, so a price or
+    // wording fix is still made once.
+    featuredOnly: { type: Boolean, default: false },
+    maxItems: { type: Number }, // blank/0 = show all
     order: { type: Number, default: 0 },
     updatedBy: { type: ObjectId, ref: 'AdminUser' },
   },
