@@ -2,10 +2,11 @@ import Link from 'next/link'
 import { listLeads } from '../../../../services/leads.js'
 import LeadFilters from '../../../../components/admin/LeadFilters.jsx'
 import LeadRowActions from '../../../../components/admin/LeadRowActions.jsx'
+import { formatDateTime } from '../../../../lib/format.js'
 
 export const dynamic = 'force-dynamic'
 
-const fmtDate = (d) => new Date(d).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+const fmtDate = formatDateTime
 
 const STATUS_STYLES = {
   new: 'bg-blue-100 text-blue-700',

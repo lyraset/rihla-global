@@ -7,10 +7,11 @@ import { buildWaLink } from '../../../../../lib/whatsapp.js'
 import LeadStatusControl from '../../../../../components/admin/LeadStatusControl.jsx'
 import LeadNoteForm from '../../../../../components/admin/LeadNoteForm.jsx'
 import DeleteLeadButton from '../../../../../components/admin/DeleteLeadButton.jsx'
+import { formatDateTime } from '../../../../../lib/format.js'
 
 export const dynamic = 'force-dynamic'
 
-const fmtDate = (d) => new Date(d).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+const fmtDate = formatDateTime
 
 function Row({ label, value }) {
   if (!value) return null

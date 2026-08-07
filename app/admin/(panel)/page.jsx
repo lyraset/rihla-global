@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { Inbox, Mail, Clock, TrendingUp } from 'lucide-react'
 import { leadCounts, listLeads } from '../../../services/leads.js'
+import { formatDateTime } from '../../../lib/format.js'
 
 export const dynamic = 'force-dynamic'
 
-const fmtDate = (d) => new Date(d).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+const fmtDate = formatDateTime
 
 export default async function DashboardPage() {
   let counts = null

@@ -1,8 +1,9 @@
 import { listAudit } from '../../../../services/audit.js'
+import { formatDateTime } from '../../../../lib/format.js'
 
 export const dynamic = 'force-dynamic'
 
-const fmt = (d) => new Date(d).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+const fmt = formatDateTime
 
 export default async function AuditPage() {
   let items = []
