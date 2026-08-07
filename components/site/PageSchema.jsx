@@ -89,7 +89,7 @@ export default function PageSchema({ data = {}, page, slug }) {
 
     case 'country': {
       const doc = (data.countries || []).find(
-        (c) => (c.code || '').toLowerCase() === (slug || '').toLowerCase(),
+        (c) => (c.code || '').toLowerCase() === (slug || '').toLowerCase() && !c.page,
       )
       if (!doc) return null
       const path = `/countries/${(doc.code || '').toLowerCase()}`

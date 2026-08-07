@@ -5,6 +5,12 @@ const { ObjectId } = mongoose.Schema.Types
 
 const countrySchema = new mongoose.Schema(
   {
+    /**
+     * Which page this item belongs to. Empty = shared by every page that
+     * renders this section (the default, and how all existing rows behave).
+     * Set it to make one page's wording independent of the others.
+     */
+    page: { type: String, default: '', index: true },
     name: { type: String, required: true },
     code: { type: String, uppercase: true, trim: true }, // ISO-2 e.g. "GB"
     flag: { type: String, default: '' }, // emoji flag e.g. "🇬🇧"

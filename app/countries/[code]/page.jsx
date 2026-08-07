@@ -9,7 +9,9 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }) {
   const { code } = await params
   const data = await getSiteData()
-  const country = data.countries.find((c) => (c.code || '').toLowerCase() === code.toLowerCase())
+  const country =
+    data.countries.find((c) => (c.code || '').toLowerCase() === code.toLowerCase() && !c.page) ||
+    data.countries.find((c) => (c.code || '').toLowerCase() === code.toLowerCase())
   if (!country) return {}
   return buildMetadata({
     path: `/countries/${code.toLowerCase()}`,
@@ -22,7 +24,7 @@ export async function generateMetadata({ params }) {
 export default async function CountryPage({ params }) {
   const { code } = await params
   const data = await getSiteData()
-  const exists = data.countries.some((c) => (c.code || '').toLowerCase() === code.toLowerCase())
+  const exists = data.countries.some((c) => (c.code || '').toLowerCase() === code.toLowerCase() && !c.page)
   if (!exists) notFound()
   return (
     <>

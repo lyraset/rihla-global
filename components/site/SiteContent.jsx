@@ -827,7 +827,11 @@ export default function SiteContent({ data, page = 'home', slug }) {
   const pages = data.pages || []
   const aboutPage = pages.find((p) => p.slug === 'about')
   const legalPage = page === 'page' ? pages.find((p) => p.slug === slug) : null
-  const countryDoc = page === 'country' ? countries.find((c) => (c.code || '').toLowerCase() === (slug || '').toLowerCase()) : null
+  const countryDoc = page === 'country' ? (() => {
+    const match = (c) => (c.code || '').toLowerCase() === (slug || '').toLowerCase()
+    // Prefer the canonical row — page-scoped copies are display-only.
+    return countries.find((c) => match(c) && !c.page) || countries.find(match)
+  })() : null
 
   // Section heading copy, scoped to the page being rendered — editing Home's
   // wording must not touch About, Services or any other page that shares the
@@ -835,7 +839,7 @@ export default function SiteContent({ data, page = 'home', slug }) {
   const copy = (key) => sectionCopy(data.sections, key, page)
   const shown = (key) => copy(key).isVisible
   // Which items this page shows from the shared collection.
-  const pick = (key, items) => pickItems(items, copy(key))
+  const pick = (key, items) => pickItems(items, copy(key), page)
   const spotlightCards = data.spotlight?.length ? data.spotlight : SPOTLIGHT_DEFAULTS
 
   return (

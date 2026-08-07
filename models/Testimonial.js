@@ -5,6 +5,12 @@ const { ObjectId } = mongoose.Schema.Types
 
 const testimonialSchema = new mongoose.Schema(
   {
+    /**
+     * Which page this item belongs to. Empty = shared by every page that
+     * renders this section (the default, and how all existing rows behave).
+     * Set it to make one page's wording independent of the others.
+     */
+    page: { type: String, default: '', index: true },
     name: { type: String, required: true },
     quote: { type: String, required: true },
     destination: String, // e.g. "UK Student Visa"

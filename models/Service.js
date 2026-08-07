@@ -5,6 +5,12 @@ const { ObjectId } = mongoose.Schema.Types
 
 const serviceSchema = new mongoose.Schema(
   {
+    /**
+     * Which page this item belongs to. Empty = shared by every page that
+     * renders this section (the default, and how all existing rows behave).
+     * Set it to make one page's wording independent of the others.
+     */
+    page: { type: String, default: '', index: true },
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true, index: true },
     shortDescription: String,

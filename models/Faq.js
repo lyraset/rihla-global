@@ -5,6 +5,12 @@ const { ObjectId } = mongoose.Schema.Types
 
 const faqSchema = new mongoose.Schema(
   {
+    /**
+     * Which page this item belongs to. Empty = shared by every page that
+     * renders this section (the default, and how all existing rows behave).
+     * Set it to make one page's wording independent of the others.
+     */
+    page: { type: String, default: '', index: true },
     question: { type: String, required: true },
     answer: String, // sanitized HTML
     category: String,
