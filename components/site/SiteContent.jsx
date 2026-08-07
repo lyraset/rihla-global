@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { sectionCopy, pickItems, SPOTLIGHT_DEFAULTS } from '../../lib/cms/section-defaults.js'
+import { countrySlug, findCountryBySegment } from '../../lib/cms/country-url.js'
 import ChatWidget from './ChatWidget.jsx'
 import {
   GraduationCap, Briefcase, Plane, Building2, FileCheck2,
@@ -555,7 +556,7 @@ function VisaPill({ label }) {
 }
 
 function CountryCard({ c }) {
-  const href = c.code ? `/countries/${c.code.toLowerCase()}` : null
+  const href = countrySlug(c) ? `/countries/${countrySlug(c)}` : null
   const types = c.visaTypes || []
   const cls = 'group flex items-center gap-3.5 rounded-xl border border-navy-800/10 bg-white p-3.5 text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-green-600/40 hover:shadow-md dark:border-white/10 dark:bg-navy-800'
   const inner = (
@@ -903,11 +904,7 @@ export default function SiteContent({ data, page = 'home', slug }) {
   const pages = data.pages || []
   const aboutPage = pages.find((p) => p.slug === 'about')
   const legalPage = page === 'page' ? pages.find((p) => p.slug === slug) : null
-  const countryDoc = page === 'country' ? (() => {
-    const match = (c) => (c.code || '').toLowerCase() === (slug || '').toLowerCase()
-    // Prefer the canonical row — page-scoped copies are display-only.
-    return countries.find((c) => match(c) && !c.page) || countries.find(match)
-  })() : null
+  const countryDoc = page === 'country' ? findCountryBySegment(countries, slug) : null
 
   // Section heading copy, scoped to the page being rendered — editing Home's
   // wording must not touch About, Services or any other page that shares the

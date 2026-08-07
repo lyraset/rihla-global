@@ -11,6 +11,12 @@ const countrySchema = new mongoose.Schema(
      * Set it to make one page's wording independent of the others.
      */
     page: { type: String, default: '', index: true },
+    /**
+     * Optional custom URL segment. Blank derives one from `name` — see
+     * lib/cms/country-url.js. Deliberately separate from `code`, which is the
+     * ISO code the flag service requires and cannot double as a URL.
+     */
+    slug: { type: String, index: true },
     name: { type: String, required: true },
     code: { type: String, uppercase: true, trim: true }, // ISO-2 e.g. "GB"
     flag: { type: String, default: '' }, // emoji flag e.g. "🇬🇧"

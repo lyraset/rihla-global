@@ -1,5 +1,6 @@
 import { siteOrigin } from '../../lib/sitemap-data.js'
 import { sectionCopy } from '../../lib/cms/section-defaults.js'
+import { countrySlug, findCountryBySegment } from '../../lib/cms/country-url.js'
 import {
   organizationSchema, websiteSchema, webPageSchema, breadcrumbSchema,
   faqSchema, serviceListSchema, countryServiceSchema, buildGraph,
@@ -72,11 +73,9 @@ export default function PageSchema({ data = {}, page, slug }) {
     }
 
     case 'country': {
-      const doc = (data.countries || []).find(
-        (c) => (c.code || '').toLowerCase() === (slug || '').toLowerCase() && !c.page,
-      )
+      const doc = findCountryBySegment(data.countries, slug)
       if (!doc) return null
-      const path = `/countries/${(doc.code || '').toLowerCase()}`
+      const path = `/countries/${countrySlug(doc)}`
       nodes.push(
         webPageSchema({ origin, path, title: `${doc.name} Visas` }),
         crumbs([
